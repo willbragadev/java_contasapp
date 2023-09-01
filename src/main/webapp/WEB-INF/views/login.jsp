@@ -26,6 +26,8 @@ input.error {
 				<div class="card-body">
 					<h5 class="text-center">Acesso ao Sistema</h5>
 					<p class="text-center">Entre com as suas credenciais de acesso.</p>
+					
+				<h4 class="text-danger text-center">${mensagem_erro}</h4>
 
 					<form id="formLogin" action="login-post" method="post">
 						<div class="mb-3">
