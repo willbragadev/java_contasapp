@@ -17,8 +17,35 @@ public class ConsultarContasController {
 	ContaRepository contaRepository;
 	//método que mapeia a rota para abrir a página
 	@RequestMapping(value = "/admin/consultar-contas")
-	public ModelAndView consultarContas() {
+	public ModelAndView consultarContas(HttpServletRequest request) {
 		ModelAndView modelAndView = new ModelAndView("admin/consultar-contas");
+		
+		//verificando se existe uma data inicio e data fim gravadas em sessão
+		if(request.getSession().getAttribute("dt_inicio") != null
+				&& request.getSession().getAttribute("dt_fim") != null) {
+			
+			//ler as datas gravadas em sessão
+			String dataInicio = (String) request.getSession().getAttribute("dt_inicio");
+			String dataFim = (String) request.getSession().getAttribute("dt_fim");
+			
+			try {
+				
+				//capturar o usuário autenticado na sessão
+				UsuarioDTO usuarioDTO = (UsuarioDTO) request.getSession().getAttribute("usuario_auth");
+				
+				//consultar as contas no banco de dados
+				List<Conta> contas = contaRepository.findAll(
+						new SimpleDateFormat("yyyy-MM-dd").parse(dataInicio),
+						new SimpleDateFormat("yyyy-MM-dd").parse(dataFim),
+						usuarioDTO.getId());
+				
+				modelAndView.addObject("listagem_contas", contas);				
+			}
+			catch(Exception e) {
+				modelAndView.addObject("mensagem_erro", e.getMessage());
+			}
+		}
+		
 		return modelAndView;
 	}
 	
@@ -43,7 +70,7 @@ public class ConsultarContasController {
 					usuarioDTO.getId());
 			
 			//verificando se alguma conta foi obtida
-			if(contas.size() != 0) {
+			if(contas.size() > 0) {
 				//enviando as contas para serem exibidas na página
 				modelAndView.addObject("listagem_contas", contas);
 			}
@@ -51,8 +78,9 @@ public class ConsultarContasController {
 				modelAndView.addObject("mensagem_alerta", "Nenhuma conta foi encontrada para o período selecionado");
 			}
 			
-			modelAndView.addObject("dt_inicio", dataInicio);
-			modelAndView.addObject("dt_fim", dataFim);
+			//gravando as datas selecionadas em sessão
+			request.getSession().setAttribute("dt_inicio", dataInicio);
+			request.getSession().setAttribute("dt_fim", dataFim);
 		}
 		catch(Exception e) {
 			modelAndView.addObject("mensagem_erro", e.getMessage());

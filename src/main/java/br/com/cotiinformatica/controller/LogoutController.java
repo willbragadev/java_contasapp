@@ -12,8 +12,8 @@ public class LogoutController {
 	@RequestMapping(value = "/logout")
 	public ModelAndView logout(HttpServletRequest request) {
 		
-		//apagando dados de sessão
-		request.getSession().removeAttribute("usuario_auth");
+		//apagando dados de sessão (apaga tudo)
+		request.getSession().invalidate();
 		
 		//redirecionando para pág de login
 		ModelAndView modelAndView = new ModelAndView();

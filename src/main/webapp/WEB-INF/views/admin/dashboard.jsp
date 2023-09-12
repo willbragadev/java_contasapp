@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
+	
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+	
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +21,8 @@
 <body>
 	<!-- componente navbar -->
 	<jsp:include page="/WEB-INF/views/admin/components/navbar.jsp"></jsp:include>
-	<!-- componente alertas -->
+	
+	<!-- componente messages -->
 	<jsp:include page="/WEB-INF/views/admin/components/messages.jsp"></jsp:include>
 	
 	<div class="container mt-4">
@@ -30,10 +35,12 @@
 				<form id="formConsulta">
 					<div class="row mb-2">
 						<div class="col-md-3">
-							<input type="date" id="dataInicio" name="dataInicio" class="form-control"/>
+							<input type="date" id="dataInicio" name="dataInicio"
+								class="form-control" value="${data_inicio}"/>
 						</div>
 						<div class="col-md-3">
-							<input type="date" id="dataFim" name="dataFim" class="form-control"/>
+							<input type="date" id="dataFim" name="dataFim"
+								class="form-control" value="${data_fim}"/>
 						</div>
 						<div class="col-md-6">
 							<input type="submit" value="Pesquisar Contas" class="btn btn-success"/>
@@ -41,7 +48,57 @@
 					</div>
 				</form>
 				
-				<div id="grafico"></div>
+				<div class="row mt-2">
+					<div class="col-md-6">
+					
+						<div class="table-responsive">
+							<table class="table table-sm table-striped table-bordered">
+								<thead>
+									<tr>
+										<th>Data</th>
+										<th>Valor</th>
+										<th>Tipo</th>
+										<th>Nome da conta</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:forEach items="${listagem_contas}" var="conta">
+										<tr>
+											<td>
+												<fmt:formatDate value="${conta.data}" pattern="EEE dd/MM/yyyy"/>
+											</td>
+											<td>
+												<fmt:formatNumber value="${conta.valor}" type="currency" currencySymbol="R$"/>
+											</td>
+											<td>
+												<c:if test="${conta.tipo == 1}">
+													<span class="badge bg-success">RECEBER</span>
+												</c:if>
+												<c:if test="${conta.tipo == 2}">
+													<span class="badge bg-danger">PAGAR</span>
+												</c:if>
+											</td>
+											<td>
+												${conta.nome}
+											</td>
+										</tr>
+									</c:forEach>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="4">
+											Quantidade de contas: ${listagem_contas.size()}
+										</td>
+									</tr>
+								</tfoot>								
+							</table>
+						</div>
+					
+					</div>
+					<div class="col-md-6">
+						<div id="grafico"></div>
+					</div>
+				</div>
 				
 			</div>
 		</div>
@@ -76,7 +133,7 @@
 			 },
 			 plotOptions: {
 			 pie: {
-			 innerSize: '50%',
+			 innerSize: '60%',
 			 dataLabels: {
 			 enabled: true,
 			 format: '<b>{point.name}</b>: {point.y:.2f}'
@@ -88,18 +145,17 @@
 			 data: [
 			 {
 			 name: 'Receitas',
-			 y: 1000,
+			 y: ${total_receitas},
 			 color: '#66bb6a'
 			 },
 			 {
 			 name: 'Despesas',
-			 y: 800,
+			 y: ${total_despesas},
 			 color: '#ef5350'
 			 }
 			 ]
 			 }]
-			 });
-			
+			 });			
 		})
 	</script>
 </body>
